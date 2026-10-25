@@ -35,28 +35,39 @@
 
 ## Локальная работа
 
-Нужны Git, Node.js 22 или новее, npm и Python 3.11 или новее для pre-commit.
-Python нужен инструменту проверки; ML-стек этой итерацией не установлен.
+Нужны Git, Node.js 22 или новее, npm, Python 3.11 или новее и `uv`.
+Python-пакет `agent-risk` пока содержит версию и smoke-тест установки.
+Логика модели и ML-зависимости появятся в следующих итерациях.
 
 ```bash
 npm ci
+uv sync --locked --python 3.11
 uv tool install pre-commit==4.7.0
 pre-commit install
 pre-commit run --all-files
 ```
 
-Если `uv` не установлен, вместо второй команды: `pipx install pre-commit==4.7.0`.
-Установленный бинарь `pre-commit` должен быть доступен через `PATH`.
+`uv sync` устанавливает пакет из `src/` и инструменты разработки в `.venv/`.
+`uv.lock` фиксирует зависимости Python. Установленный бинарь `pre-commit`
+должен быть доступен через `PATH`.
 
 ```bash
 npm run format        # форматирование Markdown, YAML и JSON
 npm run format:check  # проверка форматирования
 npm run lint         # структура Markdown
+uv run --frozen ruff check src tests
+uv run --frozen ruff format --check src tests
+uv run --frozen mypy
+uv run --frozen pytest
 ```
 
-Pre-commit также проверяет YAML/JSON, окончания строк, конфликтные маркеры
-и крупные файлы. GitHub Actions запускает тот же набор проверок на push и PR.
-Тесты модели появятся вместе с её реализацией; зелёный линтер не измеряет качество ML.
+Ruff проверяет и форматирует Python; mypy проверяет `src/` и `tests/` в строгом
+режиме. Для автоформатирования Python: `uv run --frozen ruff format src tests`.
+Pre-commit запускает Ruff и mypy, проверяет YAML/JSON/TOML, окончания строк,
+конфликтные маркеры и крупные файлы. GitHub Actions запускает эти проверки
+и отдельный job с pytest на Python 3.11 и 3.12.
+Smoke-тест проверяет импорт установленного пакета и версию. Тесты модели
+появятся вместе с её реализацией; зелёные проверки не измеряют качество ML.
 
 ## Порядок сдачи
 
