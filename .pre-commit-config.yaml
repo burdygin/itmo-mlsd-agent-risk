@@ -5,6 +5,7 @@ repos:
     hooks:
       - id: check-yaml
       - id: check-json
+      - id: check-toml
       - id: check-merge-conflict
       - id: check-added-large-files
         args: [--maxkb=512]
@@ -21,6 +22,24 @@ repos:
       - id: markdownlint
         name: markdownlint (all Markdown)
         entry: npm run lint --
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: ruff-check
+        name: ruff check (src and tests)
+        entry: uv run --frozen ruff check src tests
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: ruff-format
+        name: ruff format (src and tests)
+        entry: uv run --frozen ruff format --check src tests
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: mypy
+        name: mypy (strict, src and tests)
+        entry: uv run --frozen mypy
         language: system
         pass_filenames: false
         always_run: true
