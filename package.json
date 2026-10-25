@@ -1,0 +1,18 @@
+{
+  "name": "itmo-mlsd-agent-risk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Documentation checks for the ITMO MLSD agent tool-call risk project",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "markdownlint-cli2 \"**/*.md\" \"#node_modules\""
+  },
+  "devDependencies": {
+    "markdownlint-cli2": "0.24.0",
+    "prettier": "3.9.10"
+  }
+}

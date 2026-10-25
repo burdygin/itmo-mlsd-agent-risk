@@ -1,0 +1,11 @@
+node_modules/
+.venv/
+.env
+.env.*
+!.env.example
+.DS_Store
+__pycache__/
+.ruff_cache/
+.pytest_cache/
+data/raw/
+artifacts/
