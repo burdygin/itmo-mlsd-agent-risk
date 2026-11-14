@@ -19,21 +19,25 @@
 требуют согласования с руководителем. Дизайн не объявляет эту ML-часть требованием
 команды проекта 604.
 
-**Состояние ДЗ1:** подготовлен дизайн. Данных пока нет, тестовый стенд, обучение и
-измерение результатов относятся к следующим итерациям. Основной источник данных —
-собственная синтетика; открытые наборы допустимы после проверки лицензии и состава.
+**Состояние ДЗ2:** собраны пилотный синтетический набор v0 (1 500 семейств сценариев,
+17 453 вызова) и таблицы из открытых трасс AgentDojo, проведён EDA, в дизайне заполнен
+раздел «Этапы решения задачи». Модели ещё не обучались. Основной источник данных —
+собственная синтетика; AgentDojo служит внешней проверкой.
 
 ## Документы
 
 - [Дизайн системы](docs/ml_system_design_doc.md): цели, требования, scope,
   предпосылки, ML-задача, схемы baseline/MVP, данные и план проверки.
-- [Источники](docs/sources.md): условие ДЗ1 и основания проектных решений.
+- [Отчёт EDA](reports/eda.md): состав, качество и выводы по обоим наборам.
+- [Источники](docs/sources.md): условия ДЗ1 и ДЗ2, занятия курса и основания решений.
 
 ## Локальная работа
 
 Нужны Git, Node.js 22 или новее, npm, Python 3.11 или новее и `uv`.
-Python-пакет `agent-risk` пока содержит версию и smoke-тест установки.
-Логика модели и ML-зависимости появятся в следующих итерациях.
+Python-пакет `agent-risk` содержит словарь стенда (`catalog`), скрытое состояние
+(`world`), признаки шлюза (`gateway`), эталон последствий (`oracle`), правила B0/B1/B1+
+(`rules`), генератор синтетики (`synthetic`) и извлечение трасс AgentDojo (`agentdojo`).
+Модели появятся в следующей итерации.
 
 ```bash
 npm ci
@@ -62,11 +66,38 @@ Ruff проверяет и форматирует Python; mypy проверяе�
 Pre-commit запускает Ruff и mypy, проверяет YAML/JSON/TOML, окончания строк,
 конфликтные маркеры и крупные файлы. GitHub Actions запускает эти проверки
 и отдельный job с pytest на Python 3.11 и 3.12.
-Smoke-тест проверяет импорт установленного пакета и версию. Тесты модели
-появятся вместе с её реализацией; зелёные проверки не измеряют качество ML.
+Тесты проверяют метки эталона на контрастных примерах дизайна, скрытие сведений
+при неполном контексте, детерминированность генератора, разбор трасс и правила.
+Зелёные проверки не измеряют качество ML.
+
+## Данные и EDA
+
+```bash
+uv run --frozen python -m agent_risk generate --out data/synthetic/v0
+uv sync --locked --group eda
+uv run --frozen --group eda jupyter nbconvert --to notebook --execute --inplace \
+  notebooks/01_eda_synthetic.ipynb notebooks/02_eda_agentdojo.ipynb
+```
+
+Генерация детерминирована: те же seed и версия дают те же байты, хеши лежат
+в `data/synthetic/v0/manifest.json`. Таблицы AgentDojo строятся из трасс репозитория
+[AgentDojo](https://github.com/ethz-spylab/agentdojo) на коммите `089ed46` (лицензия MIT,
+текст — `data/external/agentdojo/LICENSE-agentdojo.txt`):
+
+```bash
+git clone --filter=blob:none --no-checkout https://github.com/ethz-spylab/agentdojo .cache/agentdojo
+git -C .cache/agentdojo sparse-checkout set runs/gpt-4o-2024-05-13 \
+  runs/claude-3-5-sonnet-20241022 runs/meta-llama_Llama-3.3-70B-Instruct
+git -C .cache/agentdojo checkout 089ed468cf3ed0322acc66b0211f26d9d90dbf60
+uv run --frozen python -m agent_risk agentdojo --runs .cache/agentdojo/runs \
+  --out data/external/agentdojo --commit 089ed468cf3ed0322acc66b0211f26d9d90dbf60
+```
+
+Рисунки отчёта ноутбуки сохраняют в `reports/figures/`.
 
 ## Порядок сдачи
 
 Работа по [ДЗ1](https://gist.github.com/pacifikus/47424379293e0874859354ecd130ba13)
-находится в ветке `hw_1`. PR из неё в `main` объединяется после ревью ментора и двух
-студентов курса.
+находится в ветке `hw_1`, по [ДЗ2](https://gist.github.com/pacifikus/bada0e4b597852e4bb50512daf451929) —
+в ветке `hw_2`, которая продолжает `hw_1`. PR объединяются в `main` после ревью ментора
+и двух студентов курса.

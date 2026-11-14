@@ -9,6 +9,7 @@ from bench import OBJECTS, PARTNER, SEND_REPORT, UPDATE_A, call
 from agent_risk.agentdojo import effect_of, parse_trace
 from agent_risk.catalog import ContextLevel, Effect
 from agent_risk.gateway import CallFeatures, History, extract_features
+from agent_risk.rules import b1, b1_plus, b1_plus_reasons
 from agent_risk.synthetic import GeneratorConfig, LabelRow, assign_split, generate
 from agent_risk.tables import call_features_from_row, read_rows, write_rows
 
@@ -97,3 +98,13 @@ def test_agentdojo_trace_marks_attacker_identifier(tmp_path: Path) -> None:
     assert not read.injection_seen_before and not read.attacker_identifier_in_args
     assert send.injection_seen_before and send.attacker_identifier_in_args
     assert effect_of("update_password") is Effect.WRITE
+
+
+def test_b1_plus_adds_ambiguous_lookup_rule() -> None:
+    wrong = call("update_record", target="rec_b")
+    seen = History(ambiguous_lookup=True)
+    coarse = extract_features(UPDATE_A, OBJECTS, wrong, seen, ContextLevel.CLASS_ONLY)
+    assert not b1(coarse)
+    assert b1_plus_reasons(coarse) == ("write_after_ambiguous_lookup",)
+    full = extract_features(UPDATE_A, OBJECTS, wrong, seen, ContextLevel.FULL)
+    assert b1(full) and b1_plus(full)

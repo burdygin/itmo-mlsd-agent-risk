@@ -34,3 +34,24 @@ def b1_reasons(f: CallFeatures) -> tuple[str, ...]:
 def b1(f: CallFeatures) -> bool:
     """B1 decision: ``True`` means high risk."""
     return bool(b1_reasons(f))
+
+
+def b1_plus_reasons(f: CallFeatures) -> tuple[str, ...]:
+    """B1+: B1 and the EDA signal of a write after an ambiguous lookup.
+
+    With an incomplete manifest the gateway cannot tell object A from object B of the
+    same class; EDA showed that wrong-object writes follow ambiguous lookups more often.
+    """
+    reasons = list(b1_reasons(f))
+    if (
+        f.effect == Effect.WRITE.value
+        and f.object_matches_task == Match.UNKNOWN.value
+        and f.ambiguous_lookup
+    ):
+        reasons.append("write_after_ambiguous_lookup")
+    return tuple(reasons)
+
+
+def b1_plus(f: CallFeatures) -> bool:
+    """B1+ decision: ``True`` means high risk."""
+    return bool(b1_plus_reasons(f))
