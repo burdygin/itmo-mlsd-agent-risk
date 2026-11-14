@@ -8,6 +8,7 @@ facts of :class:`agent_risk.world.ProposedCall` never become features.
 
 from dataclasses import dataclass
 from enum import StrEnum
+from typing import Final
 
 from agent_risk.catalog import (
     DATA_CLASS_RANK,
@@ -112,22 +113,25 @@ def _recipient_match(manifest: TaskManifest, call: ProposedCall, level: ContextL
     return Match.UNKNOWN if call.recipient.scope is manifest.recipient_scope else Match.NO
 
 
+_TOP_CLASS: Final[DataClass] = max(DataClass, key=DATA_CLASS_RANK.__getitem__)
+
+
 def _payload_class(
     objects: dict[str, StoredObject], call: ProposedCall, level: ContextLevel
 ) -> DataClass | None:
     """Highest class inside the payload, or ``None`` when the gateway cannot see it.
 
-    A source missing from the object store has no known class, so the whole payload is
-    unknown: dropping it would report a lower class than the one actually sent.
+    A source missing from the object store has no known class. Dropping it would report
+    a lower class than the one actually sent, so the payload is unknown, unless a known
+    source already has the top class: nothing missing can raise it further.
     """
     if not _provenance_visible(level):
         return None
-    if any(s not in objects for s in call.payload_sources):
+    classes = [objects[s].data_class for s in call.payload_sources if s in objects]
+    top = max(classes, key=DATA_CLASS_RANK.__getitem__) if classes else DataClass.PUBLIC
+    if len(classes) < len(call.payload_sources) and top is not _TOP_CLASS:
         return None
-    classes = [objects[s].data_class for s in call.payload_sources]
-    if not classes:
-        return DataClass.PUBLIC
-    return max(classes, key=DATA_CLASS_RANK.__getitem__)
+    return top
 
 
 def extract_features(

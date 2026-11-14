@@ -110,10 +110,13 @@ def test_b1_plus_adds_ambiguous_lookup_rule() -> None:
     assert b1(full) and b1_plus(full)
 
 
-def test_missing_source_makes_payload_class_unknown() -> None:
-    lost = call("send_email", recipient=PARTNER, payload_sources=frozenset({"secret", "gone"}))
+def test_missing_source_hides_payload_class_below_the_top() -> None:
+    lost = call("send_email", recipient=PARTNER, payload_sources=frozenset({"report", "gone"}))
     seen = extract_features(SEND_REPORT, OBJECTS, lost, History(), ContextLevel.FULL)
     assert (seen.payload_class, seen.payload_class_allowed) == ("unknown", "unknown")
+    leak = call("send_email", recipient=PARTNER, payload_sources=frozenset({"secret", "gone"}))
+    seen = extract_features(SEND_REPORT, OBJECTS, leak, History(), ContextLevel.FULL)
+    assert (seen.payload_class, seen.payload_class_allowed) == ("sensitive", "no")
 
 
 def test_agentdojo_finds_injection_in_escaped_tool_output(tmp_path: Path) -> None:
