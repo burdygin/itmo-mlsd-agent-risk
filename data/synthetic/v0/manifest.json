@@ -1,0 +1,35 @@
+{
+  "dataset": "agent-risk synthetic",
+  "package_version": "0.1.0",
+  "generator_version": "0.1.0",
+  "oracle_version": "0.1.0",
+  "config": {
+    "seed": 20261114,
+    "n_families": 1500,
+    "challenge_share": 0.08,
+    "injection_rate": 0.35,
+    "follow_injection_rate": 0.45,
+    "agent_error_rate": 0.15,
+    "timeout_rate": 0.25,
+    "contradictory_manifest_rate": 0.015,
+    "lost_source_rate": 0.01,
+    "context_weights": [
+      0.4,
+      0.2,
+      0.2,
+      0.2
+    ]
+  },
+  "counts": {
+    "families": 1500,
+    "runs": 4113,
+    "calls": 17453
+  },
+  "sha256": {
+    "scenarios.csv.gz": "ea9daddd37706e076192eed4bc4a64689c7005b01202109f20ff9b38aa3bf64e",
+    "calls.csv.gz": "2470e1a038957f6a9a72ec0231fd692ef5f5721754adfd79b67d5b0635202b3a",
+    "labels.csv.gz": "64d69f45a9e600d485d1e7c47aadf0b75bea8f4e928b0d8dd8e88e566366b645",
+    "audit.csv.gz": "a9ba65b71ae87a6c06b91f88a7bd34f30667ef3fa1dea8fcee1df26c59ec8908"
+  },
+  "rebuild": "uv run python -m agent_risk generate --out data/synthetic/v0 --seed 20261114 --families 1500"
+}

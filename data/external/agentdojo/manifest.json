@@ -1,0 +1,20 @@
+{
+  "dataset": "AgentDojo published traces, derived tables",
+  "source": "https://github.com/ethz-spylab/agentdojo",
+  "source_commit": "089ed468cf3ed0322acc66b0211f26d9d90dbf60",
+  "license": "MIT, see LICENSE-agentdojo.txt",
+  "models": [
+    "claude-3-5-sonnet-20241022",
+    "gpt-4o-2024-05-13",
+    "meta-llama_Llama-3.3-70B-Instruct"
+  ],
+  "counts": {
+    "runs": 10631,
+    "calls": 39857
+  },
+  "sha256": {
+    "runs.csv.gz": "055575ab70bf7f9caad7a994c055fd79396743912c2a3a09a5969f00b842b0a0",
+    "calls.csv.gz": "1d5f24afa70a41d64b1abd5061e197527febbbbb9f308ceb29aa372c905fb75b"
+  },
+  "package_version": "0.1.0"
+}
