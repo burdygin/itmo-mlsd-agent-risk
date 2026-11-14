@@ -115,10 +115,16 @@ def _recipient_match(manifest: TaskManifest, call: ProposedCall, level: ContextL
 def _payload_class(
     objects: dict[str, StoredObject], call: ProposedCall, level: ContextLevel
 ) -> DataClass | None:
-    """Highest class inside the payload, or ``None`` when the gateway cannot see it."""
+    """Highest class inside the payload, or ``None`` when the gateway cannot see it.
+
+    A source missing from the object store has no known class, so the whole payload is
+    unknown: dropping it would report a lower class than the one actually sent.
+    """
     if not _provenance_visible(level):
         return None
-    classes = [objects[s].data_class for s in call.payload_sources if s in objects]
+    if any(s not in objects for s in call.payload_sources):
+        return None
+    classes = [objects[s].data_class for s in call.payload_sources]
     if not classes:
         return DataClass.PUBLIC
     return max(classes, key=DATA_CLASS_RANK.__getitem__)

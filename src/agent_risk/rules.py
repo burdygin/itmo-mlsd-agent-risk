@@ -1,4 +1,4 @@
-"""Baselines B0 and B1 from the design document, computed on gateway features only."""
+"""Baselines B0, B1 and B1+ from the design document, computed on gateway features only."""
 
 from agent_risk.catalog import Effect, Scope
 from agent_risk.gateway import UNKNOWN_CLASS, CallFeatures, Match

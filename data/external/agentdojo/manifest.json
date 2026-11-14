@@ -13,8 +13,8 @@
     "calls": 39857
   },
   "sha256": {
-    "runs.csv.gz": "055575ab70bf7f9caad7a994c055fd79396743912c2a3a09a5969f00b842b0a0",
-    "calls.csv.gz": "1d5f24afa70a41d64b1abd5061e197527febbbbb9f308ceb29aa372c905fb75b"
+    "runs.csv.gz": "1805bf38369419dd8dfe752b4de559a46b54c75bc0518dbcaa3cb101c9a6700a",
+    "calls.csv.gz": "77cc52c8dd9d3dce8bf9c2327df910f027f339017062cfab881ebac79524f818"
   },
   "package_version": "0.1.0"
 }
